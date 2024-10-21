@@ -1,0 +1,28 @@
+import telebot
+from langdetect import detect
+import random
+
+# Замените эту строку вашим токеном бота
+TOKEN = 'YOUR_BOT_TOKEN'
+
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    bot.send_message(message.chat.id, 'Привет! Я могу определить язык вашего сообщения и ответить случайным сообщением.')
+
+@bot.message_handler(content_types=['text'])
+def detect_language(message):
+    try:
+        language = detect(message.text)
+        responses = {
+            'en': ['Hello!', 'Hi!', 'Hey!'],
+            'ru': ['Привет!', 'Здравствуйте!', 'Хей!'],
+            # Добавьте больше языков и ответов по мере необходимости
+        }
+        response = random.choice(responses.get(language, ['Я не понял ваш язык.']))
+        bot.send_message(message.chat.id, response)
+    except Exception as e:
+        bot.send_message(message.chat.id, f'Ошибка: {str(e)}')
+
+bot.polling(none_stop=True, interval=0)
